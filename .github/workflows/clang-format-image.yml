@@ -64,3 +64,16 @@ jobs:
           build-args: |
             "UBUNTU_VERSION=${{ matrix.version-pair.ubuntu }}"
             "CLANG_FORMAT_VERSION=${{ matrix.version-pair.version }}"
+  clean-untagged-images:
+    needs: publish-image
+    name: Clean untagged images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '^1.22'
+          check-latest: true
+      - name: Install ghcr-cleaner
+        run: go install github.com/jidicula/ghcr-cleaner@latest
+      - name: Run ghcr-cleaner
+        run: ghcr-cleaner --token "${{ secrets.GITHUB_TOKEN }}" --packagename clang-format
